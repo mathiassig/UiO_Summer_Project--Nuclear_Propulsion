@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Netherlands;NTH;Europe;true;true;reactor_manufacturing;2030;63;SMR/year;true;2035,2049;2;Rotterdam,North Sea Port;51.9244,51.3225;4.4777,3.8196

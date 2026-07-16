@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Italy;ITA;Europe;true;false;none;0;0;none;true;2051,2051;2;Genoa,Trieste;44.4056,45.6495;8.9463,13.7768

@@ -1,0 +1,2 @@
+name;installed_P[MWe];propulsion[MWe];auxiliary[MWe];avg_speed[knots];op_time[h];portcalls
+Medium_Icebreaker;50;49;1;10;4500;20

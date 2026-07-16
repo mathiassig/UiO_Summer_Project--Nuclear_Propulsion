@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Japan;JPN;Asia;true;true;triso_fabrication;2040;10;tU/year;false;0;0;none;0;0

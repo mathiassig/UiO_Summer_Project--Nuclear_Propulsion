@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Australia;AUS;Oceania;true;true;reactor_manufacturing;2055;0;SMR/year;true;2055,2056;2;Melbourne,Newcastle;-37.8430,-32.9283;144.9170,151.7817

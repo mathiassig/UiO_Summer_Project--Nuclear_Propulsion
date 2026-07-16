@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+France;FRA;Europe;true;true;triso_fabrication;2035;2;tU/year;true;2048,2049;2;HAROPA/Le Havre-Rouen-Paris,Marseille-Fos;49.4944,43.3500;0.1079,5.3400

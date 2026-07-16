@@ -1,0 +1,17 @@
+port_name;nuclear_available_from_year
+Rotterdam;2037
+Singapore;2038
+Hamburg;2038
+Shanghai;2040
+Provideniya;2041
+Busan;2045
+Jebel Ali;2045
+Los Angeles;2050
+Algeciras;2050
+Murmansk;2050
+Savannah;2055
+Santos;2055
+Melbourne;2060
+Durban;2060
+Tromsø;2060
+Port Klang;2060

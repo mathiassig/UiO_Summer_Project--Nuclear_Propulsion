@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+China;CHI;Asia;false;true;enrichment,triso_fabrication;2035,2035;20,2.1;tU/year;true;2035,2043,2044,2045,2046,2046,2044,2046;8;Shanghai,Ningbo-Zhoushan,Shenzhen,Qingdao,Guangzhou,Tianjin,Hong Kong,Xiamen;31.2304,29.8683,22.5431,36.0671,23.1291,38.9850,22.3193,24.4798;121.4737,121.5440,114.0579,120.3826,113.2644,117.7040,114.1694,118.0894

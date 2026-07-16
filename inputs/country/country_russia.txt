@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Russia;RUSS;Asia;false;true;enrichment;2035;30;tU/year;true;2041,2041,2046;3;Provideniya,Arkhangelsk,Murmansk;64.421881,64.520256,68.979161;-173.231722,40.540426,33.066163

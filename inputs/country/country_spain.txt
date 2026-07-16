@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Spain;ESP;Europe;true;false;none;0;0;none;true;2048,2048,2049;3;Algeciras,Valencia,Barcelona;36.1408,39.4486,41.3527;-5.4562,-0.3236,2.1667

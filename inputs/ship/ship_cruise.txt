@@ -1,0 +1,2 @@
+name;installed_P[MWe];propulsion[MWe];auxiliary[MWe];avg_speed[knots];op_time[h];portcalls
+Large_cruise;100;93.57;6.43;22;6200;100

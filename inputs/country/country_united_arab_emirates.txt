@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+United Arab Emirates;UAE;Middle East;false;true;reactor_manufacturing;2041;0;SMR/year;true;2039;1;Jebel Ali;25.0113;55.0612

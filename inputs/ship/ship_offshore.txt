@@ -1,0 +1,2 @@
+name;installed_P[MWe];propulsion[MWe];auxiliary[MWe];avg_speed[knots];op_time[h];portcalls
+Offshore_vessel;25;24.18;0.82;11.6;5500;50

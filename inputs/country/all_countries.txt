@@ -1,0 +1,23 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Netherlands;NTH;Europe;true;true;reactor_manufacturing;2030;63;SMR/year;true;2035,2049;2;Rotterdam,North Sea Port;51.9244,51.3225;4.4777,3.8196Norway;NOR;Europe;true;false;none;0;0;none;true;2052,2047,2048;3;Bergen,Kirkenes,Tromsø;60.3929,69.728805,69.647323;5.3242,30.071908,18.961797
+Poland;POL;Europe;true;false;none;0;0;none;true;2050;1;Gdansk;54.3520;18.6466
+Russia;RUSS;Asia;false;true;enrichment;2035;30;tU/year;true;2041,2041,2046;3;Provideniya,Arkhangelsk,Murmansk;64.421881,64.520256,68.979161;-173.231722,40.540426,33.066163
+Romania;ROU;Europe;false;false;none;0;0;none;true;2052;1;Constanta;44.1598;28.6348
+Singapore;SIG;Asia;false;false;none;0;0;none;true;2035;1;Singapore;1.2644;103.8400
+South Africa;SAF;Africa;FALSE;false;none;0;0;none;true;2057;1;Durban;-29.877039;31.032090
+Spain;ESP;Europe;true;false;none;0;0;none;true;2048,2048,2049;3;Algeciras,Valencia,Barcelona;36.1408,39.4486,41.3527;-5.4562,-0.3236,2.1667
+Taiwan;TWN;Asia;false;false;none;0;0;none;true;2047;1;Kaohsiung;22.6273;120.3014
+Thailand;THA;Asia;false;false;none;0;0;none;true;2047;1;Laem Chabang;13.0878;100.8833
+Malaysia;MYS;Asia;false;true;reactor_manufacturing;2038;0;SMR/year;true;2045,2045;2;Port Klang,Tanjung Pelepas;3.0019,1.3639;101.3998,103.5396
+United Arab Emirates;UAE;Middle East;false;true;reactor_manufacturing;2041;0;SMR/year;true;2039;1;Jebel Ali;25.0113;55.0612
+United Kingdom;UK;Europe;true;true;enrichment;2035;27;tU/year;false;0;0;none;0;0
+Brazil;BRA;America;false;true;reactor_manufacturing;2054;0;SMR/year;true;2054;1;Santos;-23.9608;-46.3336
+China;CHI;Asia;false;true;enrichment,triso_fabrication;2035,2035;30,2.1;tU/year;true;2035,2043,2044,2045,2046,2046,2044,2046;8;Shanghai,Ningbo-Zhoushan,Shenzhen,Qingdao,Guangzhou,Tianjin,Hong Kong,Xiamen;31.2304,29.8683,22.5431,36.0671,23.1291,38.9850,22.3193,24.4798;121.4737,121.5440,114.0579,120.3826,113.2644,117.7040,114.1694,118.0894
+France;FRA;Europe;true;true;triso_fabrication;2035;2;tU/year;true;2048,2049;2;HAROPA/Le Havre-Rouen-Paris,Marseille-Fos;49.4944,43.3500;0.1079,5.3400
+Germany;DEU;Europe;true;false;none;0;0;none;true;2035,2050,2050;3;Hamburg,Bremen/Bremerhaven,Niedersachsen;53.5511,53.5396,53.5250;9.9937,8.5809,8.1150
+Italy;ITA;Europe;true;false;none;0;0;none;true;2051,2051;2;Genoa,Trieste;44.4056,45.6495;8.9463,13.7768
+Japan;JPN;Asia;true;true;triso_fabrication;2040;10;tU/year;false;0;0;none;0;0
+South Korea;SKO;Asia;true;false;none;0;0;none;true;2038;1;Busan;35.1796;129.0756
+Australia;AUS;Oceania;true;true;reactor_manufacturing;2055;0;SMR/year;true;2055,2056;2;Melbourne,Newcastle;-37.8430,-32.9283;144.9170,151.7817
+Belgium;BEL;Europe;true;false;none;0;0;none;true;2035;1;Antwerp-Bruges;51.2602;4.4028
+United States;USA;America;true;true;enrichment,triso_fabrication,reactor_manufacturing;2035,2035,2047;1,16,0;tU/year;true;2047,2048,2053,2050;4;Los Angeles,Long Beach,New York and New Jersey,Savannah;33.738656,33.7701,40.6681,32.0809;-118.263774,-118.1937,-74.0451,-81.0912

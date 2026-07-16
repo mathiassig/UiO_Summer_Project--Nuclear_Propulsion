@@ -1,0 +1,12 @@
+Ship segment;Fleet share;Reactor;Country;Deployment phase
+bulkcarrier;21.6;allseas_high-enr;united_kingdom;1
+container;7.0;allseas_high-enr;united_kingdom;1
+l_container;18.0;allseas_high-enr;united_kingdom;1
+ul_container;20.0;allseas_high-enr;united_kingdom;1
+offshore;12.6;allseas_high-enr;united_kingdom;1
+tanker;2.7;allseas_high-enr;united_kingdom;1
+m_icebreaker;3.0;allseas_high-enr;united_kingdom;1
+l_icebreaker;3.0;allseas_high-enr;united_kingdom;1
+fishing;2.1;allseas_high-enr;united_kingdom;2
+cruise;5.0;allseas_high-enr;united_kingdom;2
+ferry;5.0;allseas_high-enr;united_kingdom;2

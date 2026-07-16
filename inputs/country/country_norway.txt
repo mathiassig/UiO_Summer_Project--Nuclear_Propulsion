@@ -1,0 +1,2 @@
+name;iso3;region;oecd_member;supply;step;supply_from_year;capacity;capacity_unit;operation;available_from_year;ports;port_names;latitude;longitude
+Norway;NOR;Europe;true;false;none;0;0;none;true;2052,2047,2048;3;Bergen,Kirkenes,Tromsø;60.3929,69.728805,69.647323;5.3242,30.071908,18.961797
