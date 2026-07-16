@@ -287,6 +287,11 @@ The environment can be created from:
 conda env create -f environment.yml
 conda activate summer-env
 ```
+The fuel and infrastructure needs model can be run with:
+
+```bash
+python main.py
+```
 
 The maritime network model can be run with:
 
@@ -300,6 +305,11 @@ The port-service hub allocation can be run with:
 python port_service_hub_allocation.py
 ```
 
+The sensitivity analysis can be run with:
+
+```bash
+python sensitivity.py
+```
 ---
 
 ## Notes
