@@ -123,33 +123,39 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
             K1 = 0
             K2 = ships_end
         return round(K1*sigmoid(year,steepness,(end_year-2035)/2)+K2*sigmoid(year,steepness,(end_year-2035+phasechange)/2))
-    years = [i for i in range(end_year-2035+1)]# years after 2035
+    years = [i for i in range(end_year-2035+1+N_years+storeyears)]# years after 2035, goes until end_year + N_years+storeyears
     fleet_shares = np.loadtxt(f"inputs/scenario/scenario_{scenario}.txt",delimiter=';',dtype=str)
     fleet = []
     fuel_needs = []
     infrastructure_needs = []
     ships_in_fleet = [] # total number of ships in fleet per year
     for year in years: # loop over years after 2035
-        fleet_i = []
-        ships_in_fleet_i = 0
-        for j in range(1,len(fleet_shares[:,0])): # loop over ship segments
-            shipnumber= two_phase_deployment(fleet_shares[j,1].astype(float)*1e-2*ships_total,
-                                                                                    fleet_shares[j,4].astype(int),
-                                                                                    year,
-                                                                                    phasechange=phasechange,
-                                                                                    end_year=end_year,
-                                                                                    steepness=steepness)
-            ships_in_fleet_i+=shipnumber
-            fleet_i.append(init_powered_ship_from_files(f"inputs/ship/ship_{fleet_shares[j,0]}.txt", # ship file
-                                                        f"inputs/reactor_{fleet_shares[j,2]}.txt", # reactor file
-                                                        f"inputs/country/country_{fleet_shares[j,3]}.txt", # country file
-                                                        #number=round(fleet_shares[j,1].astype(float)*1e-2*ships_total*sigmoid(year,1,years[-1]/2)))
-                                                        number=shipnumber
-                                                        ))
-        ships_in_fleet.append(ships_in_fleet_i)
-        fleet.append(fleet_i)
-        fuel_needs_i = model(fleet_i,tail_assay,feed_assay,m_U_pebble,d_pebble,geometric_factor)
-        fuel_needs.append(fuel_needs_i)
+        if year<=(end_year-2035): #  only update fleet composition until end_year
+            fleet_i = []
+            ships_in_fleet_i = 0
+            for j in range(1,len(fleet_shares[:,0])): # loop over ship segments
+                shipnumber= two_phase_deployment(fleet_shares[j,1].astype(float)*1e-2*ships_total,
+                                                                                        fleet_shares[j,4].astype(int),
+                                                                                        year,
+                                                                                        phasechange=phasechange,
+                                                                                        end_year=end_year,
+                                                                                        steepness=steepness)
+                ships_in_fleet_i+=shipnumber
+                fleet_i.append(init_powered_ship_from_files(f"inputs/ship/ship_{fleet_shares[j,0]}.txt", # ship file
+                                                            f"inputs/reactor_{fleet_shares[j,2]}.txt", # reactor file
+                                                            f"inputs/country/country_{fleet_shares[j,3]}.txt", # country file
+                                                            #number=round(fleet_shares[j,1].astype(float)*1e-2*ships_total*sigmoid(year,1,years[-1]/2)))
+                                                            number=shipnumber
+                                                            ))
+            ships_in_fleet.append(ships_in_fleet_i)
+            fleet.append(fleet_i)
+            fuel_needs_i = model(fleet_i,tail_assay,feed_assay,m_U_pebble,d_pebble,geometric_factor)
+            fuel_needs.append(fuel_needs_i)
+        else: # the case where deployment is finished, but need to run simulation until fuel and infrastructure values converge
+            ships_in_fleet_i = ships_in_fleet[-1]
+            ships_in_fleet.append(ships_in_fleet_i)
+            fuel_needs_i = model(fleet[-1],tail_assay,feed_assay,m_U_pebble,d_pebble,geometric_factor)
+            fuel_needs.append(fuel_needs_i)
         # calculate fresh and spent fuel storage needs
         if year == 0:
             fresh_store=N_years*fuel_needs[year].waste # "waste" is a measure of total pebble volume burnt per year on average
@@ -400,8 +406,8 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
         for j in range(len(fleet_matrix[0,:])):
             shipnumber = np.array([fleet_matrix[i,j].shipnumber for i in range(len(fleet_matrix[:,j]))])
             ships_total_over_time += shipnumber
-            plt.plot(np.array(years)+2035,shipnumber,label=fleet_matrix[0,j].shipname)            
-        plt.plot(np.array(years)+2035,ships_total_over_time,label="Total",lw =4,color='k')
+            plt.plot(np.array(years[:len(shipnumber)])+2035,shipnumber,label=fleet_matrix[0,j].shipname)            
+        plt.plot(np.array(years[:len(ships_total_over_time)])+2035,ships_total_over_time,label="Total",lw =4,color='k')
         plt.title(f"Fleet size over time\n in {scenario} scenario")
         plt.xlabel("Year")
         plt.ylabel("Number of vessels")
