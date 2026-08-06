@@ -16,7 +16,7 @@ def matrix_to_dictionary(matrix):
     data_dict = {matrix[0,idx]: list(col) for idx, col in enumerate(zip(*matrix[1:,:]))}
     
     return data_dict
-def tornadoplot(low_values,high_values,base_value,value_label,variables = ['Reactor burnup','Fuel enrichment', 'Refueling interval', 'Spent fuel storage time']):
+def tornadoplot(low_values,high_values,base_value,value_label,variables = ['Reactor burnup','Fuel enrichment', 'Refueling interval', 'Spent fuel storage time','Burnup, enrichment and refueling']):
     """
     Make tornado plot.
 
@@ -88,7 +88,7 @@ def is_string(a):
     else:
         return False
 def main():
-    scenarios = ["baseline","high-burnup","low-burnup","high-enrichment","low-enrichment","7R","4R","10S","4S"] # make sure that scenarios[0] is baseline, odd index is high and even index is low
+    scenarios = ["baseline","high-burnup","low-burnup","high-enrichment","low-enrichment","7R","4R","10S","4S","high","low"] # make sure that scenarios[0] is baseline, odd index is high and even index is low
     data = {}
     for scenario in scenarios:
         data[scenario] = matrix_to_dictionary(np.loadtxt(f"outputs/{scenario}_global_fuel_infrastructure.txt",delimiter=';',dtype=str))
@@ -121,6 +121,6 @@ def main():
                 high_values.append(temp)
         low_values = np.array(low_values)
         high_values = np.array(high_values)
-        tornadoplot(low_values,high_values,base_value,value_label,variables = ['Reactor burnup','Fuel enrichment', 'Refueling interval', 'Spent fuel storage time'])
+        tornadoplot(low_values,high_values,base_value,value_label,variables = ['Reactor burnup','Fuel enrichment', 'Refueling interval', 'Spent fuel storage time','Combined'])
 if __name__ == "__main__":
     main()

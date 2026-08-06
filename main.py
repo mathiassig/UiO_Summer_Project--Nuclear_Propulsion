@@ -418,7 +418,7 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
     return
 
 def main():
-    scenarios = ["baseline","high-burnup","low-burnup","high-enrichment","low-enrichment","4R","7R","4S","10S"]
+    scenarios = ["baseline","high-burnup","low-burnup","high-enrichment","low-enrichment","4R","7R","4S","10S","high","low"]
     for scenario in scenarios:
         if scenario == "baseline":
             run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,steepness=0.55,phasechange=7,
@@ -446,6 +446,13 @@ def main():
                 else:
                     print(f"Error: refueling time or storage time change scenario failed, code:{scenario}")
                     break
+        # scenarios with combined high and low refueling interval, burnup and enrichment
+        elif scenario == "high":
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=7,steepness=0.55,phasechange=7,
+                                save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
+        elif scenario == "low":
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=4,steepness=0.55,phasechange=7,
+                                save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
         else:
             run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=5,steepness=0.55,phasechange=7,
                           save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
