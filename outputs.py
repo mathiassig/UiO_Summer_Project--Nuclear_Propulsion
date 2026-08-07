@@ -1,10 +1,11 @@
 class FuelNeeds:
-    def __init__(self,fuel_throughput,swu,feedmass,pebble_number,waste):
+    def __init__(self,fuel_throughput,swu,feedmass,pebble_number,waste,reactor_number_fleet):
         self.fuel_throughput = fuel_throughput # fuel throughput [tons of enriched uranium]
         self.pebble_number = pebble_number# TRISO pebbles needed = TRISO pebbles out
         self.swu = swu # separative work needed [SWU]
         self.feedmass = feedmass # natural uranium need in [tons]
         self.waste = waste # waste volume [m^3]
+        self.reactor_number_fleet = reactor_number_fleet # number of reactors in the whole fleet
 class InfrastructureNeeds:
     def __init__(self,fresh_store,spent_store,
                  refuelings,refueling_tons,refueling_pebbles,

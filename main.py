@@ -37,15 +37,17 @@ def model(powered_ships,
     pebble_number = 0.0 # number of fuel pebbles
     waste = 0.0 # m^3 volume of waste pebbles
     swu = 0.0 # SWU 
-    for powered_ship in powered_ships:
+    reactor_number_fleet = 0 # number of reactors in fleet
+    for powered_ship in powered_ships: # iterate over ship segments
         # The following returns masses/SWUs needed per year. Must multiply by N_years to get per refueling
         fuelmass  = fuelmass_from_burnup(powered_ship.power,powered_ship.op_time/24,powered_ship.burnup)*powered_ship.total_reactornumber
         fuel_throughput += fuelmass
         swu  += SW(fuelmass*1e+3,powered_ship.enrichment*1e-2,tail_assay,feed_assay)
         _feedmass += feedmass(fuelmass,powered_ship.enrichment*1e-2,tail_assay,feed_assay)
         pebble_number += fuelmass/(m_U_pebble*1e-6)
+        reactor_number_fleet+=powered_ship.total_reactornumber # add all reactors for this ship segment
     waste = pebble_number*np.pi/6*d_pebble**3*geometric_factor # waste volume
-    return FuelNeeds(fuel_throughput,swu,_feedmass,pebble_number,waste)
+    return FuelNeeds(fuel_throughput,swu,_feedmass,pebble_number,waste,reactor_number_fleet)
 
 # Deployment over time (2035-2060)
 def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_assay = 0.72*1e-2,
@@ -242,6 +244,7 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
     swu = [infrastructure_needs[i].swu for i in range(len(fuel_needs))]
     feedmass = [infrastructure_needs[i].feedmass for i in range(len(fuel_needs))]
     waste  = [fuel_needs[i].waste for i in range(len(fuel_needs))]
+    reactors_in_fleet = [fuel_needs[i].reactor_number_fleet for i in range(len(fuel_needs))]
     fresh_store = [infrastructure_needs[i].fresh_store for i in range(len(infrastructure_needs))]
     spent_store = [infrastructure_needs[i].spent_store for i in range(len(infrastructure_needs))]
     fuelinit = [infrastructure_needs[i].fuelinit for i in range(len(infrastructure_needs))]
@@ -266,11 +269,11 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
     data_matrix.append(["year","fuel throughput [tons]","fuel throughput [pebbles]", "seperative work [SWU]", "feedmass [tons]",
                         "waste [m^3]","fresh fuel storage [m^3]","spent fuel storage [m^3]",
                           "new ships deployed", "number of refuelings", "initial fuel loading [tons]","refueling [tons]",
-                          "initial fuel loading [pebbles]", "refueling [pebbles]","truckloads of waste transported"])
+                          "initial fuel loading [pebbles]", "refueling [pebbles]","truckloads of waste transported","reactors in fleet"])
     for i in range(len(years)):
         data_matrix.append([years[i]+2035,fuel_throughput[i],pebble_number[i],swu[i],feedmass[i],waste[i],
                             fresh_store[i],spent_store[i],fuelinit[i],refuelings[i],fuelinit_tons[i],refueling_tons[i],
-                            fuelinit_pebbles[i],refueling_pebbles[i],truckloads_waste[i]])
+                            fuelinit_pebbles[i],refueling_pebbles[i],truckloads_waste[i],reactors_in_fleet[i]])
     np.savetxt(f"outputs/{scenario}_global_fuel_infrastructure.txt", data_matrix,fmt='%s',delimiter=';')
 
     if plotting:
@@ -328,6 +331,15 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
         plt.ylabel(r"Number of truckloads")
         if save_plots:
             plt.savefig(f"plots/{scenario}_truckloads_waste.png")
+        plt.close()
+
+        # plot number of reactors in fleet per year
+        plt.plot(np.array(years)+2035,np.array(reactors_in_fleet),color='m',marker='s') 
+        plt.title(f"Reactors in fleet")
+        plt.xlabel("Year")
+        plt.ylabel(r"Number of reactors")
+        if save_plots:
+            plt.savefig(f"plots/{scenario}_reactornumber.png")
         plt.close()
 
         # plot fresh fuel storage needs
