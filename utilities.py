@@ -77,7 +77,7 @@ def fuelmass_from_burnup(power,time,burnup):
     Parameters
     ----------
     power : float
-        The reactor power [MW].
+        The reactor power [MWe].
     time : float
         Operating time [days].
     burnup : float
@@ -87,7 +87,8 @@ def fuelmass_from_burnup(power,time,burnup):
     float
         The fuel mass [metric tons].
     """
-    return power*time/(burnup*1e+3)
+    electric_to_thermal_factor = 70/25
+    return (power*electric_to_thermal_factor)*time/(burnup*1e+3)
 
 def feedmass(fuelmass,enrichment,tail_assay,feed_assay):
     """
