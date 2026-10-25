@@ -23,6 +23,7 @@ outputs/
   maritime/                 Route-network outputs and maps
   port_service_hubs/        Nuclear port-service allocation outputs and plots
 
+Summer_Project_Report.pdf   Scientific report
 country.py                  Country data structure
 main_maritime_network.py    Maritime route-network model
 port_service_hub_allocation.py Port-service hub allocation model
