@@ -379,11 +379,7 @@ def add_distance_to_ships(ships):
 
     return ships_with_distance
 
-def get_ship_numbers_for_year(
-    deployment_file,
-    year,
-    start_year=2035,
-):
+def get_ship_numbers_for_year(deployment_file, year, start_year=2035,):
     """
     Read deployment_baseline.txt and return the number of ships
     of each segment in the selected year.
@@ -589,7 +585,8 @@ def plot_fleet_distance_capacity(
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
-    plt.show()
+    #plt.show()
+    plt.close()
 
     print(f"Fleet distance-capacity plot saved to: {output_file}")
 
@@ -633,7 +630,8 @@ def plot_fleet_portcall_capacity(
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
-    plt.show()
+    #plt.show()
+    plt.close()
 
     print(f"Fleet port-call-capacity plot saved to: {output_file}")
 
@@ -1063,7 +1061,8 @@ def plot_routes_for_segment_year(
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
-    plt.show()
+    #plt.show()
+    plt.close()
 
     print(f"Route map saved to: {output_file}")
 
@@ -1223,7 +1222,8 @@ def plot_all_routes_for_year(
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
-    plt.show()
+    #plt.show()
+    plt.close()
 
     print(f"All-segment route map saved to: {output_file}")
 
@@ -1428,7 +1428,8 @@ def main():
         nuclear_port_file=NUCLEAR_PORT_INPUT_FILE,
         start_year=2035,
         end_year=2060,
-        plot_years=[2050,2051,2052,2053,2054,2055],
+        plot_years=[
+            2055,2060],
         plot_segments=[
             "Bulk_carrier",
             "Panamax_container",
@@ -1436,9 +1437,10 @@ def main():
             "Ultra_large_container",
             "Offshore_vessel",
             "Oil_tanker",
+            "Chemical_tanker",
             "Medium_Icebreaker",
             "Large_Icebreaker",
-            "Fishing_vessels",
+            "Fishing_vessel",
             "Large_cruise",
             "Passenger_ferry",
         ],
@@ -1460,7 +1462,7 @@ if __name__ == "__main__":
             "Oil_tanker",
             "Medium_Icebreaker",
             "Large_Icebreaker",
-            "Fishing_vessels",
+            "Fishing_vessel",
             "Large_cruise",
             "Passenger_ferry",
         ],

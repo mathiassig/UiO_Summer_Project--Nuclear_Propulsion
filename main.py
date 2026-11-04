@@ -8,7 +8,6 @@ def model(powered_ships,
           tail_assay=0.4*1e-2,feed_assay = 0.72*1e-2, # assume tail assay of 0.40% and natural uranium as feed as default
           m_U_pebble = 8,
           d_pebble = 6*1e-2,
-          geometric_factor = 25 
           ):
     """
     Main function for calculating model outputs for a single year.
@@ -25,8 +24,6 @@ def model(powered_ships,
         Uranium mass in a single fuel pebble [g]
     d_pebble: float
         Diameter of TRISO pebble [m]
-    geometric_factor: float
-        Conversion factor between pebble volume and storage cylinder volume.
     Returns
     -------
     instance of FuelNeeds class
@@ -40,19 +37,19 @@ def model(powered_ships,
     reactor_number_fleet = 0 # number of reactors in fleet
     for powered_ship in powered_ships: # iterate over ship segments
         # The following returns masses/SWUs needed per year. Must multiply by N_years to get per refueling
-        fuelmass  = fuelmass_from_burnup(powered_ship.power,powered_ship.op_time/24,powered_ship.burnup)*powered_ship.total_reactornumber
+        fuelmass  = fuelmass_from_burnup(powered_ship.propulsion+powered_ship.auxiliary,powered_ship.op_time/24,powered_ship.burnup)*powered_ship.shipnumber
         fuel_throughput += fuelmass
         swu  += SW(fuelmass*1e+3,powered_ship.enrichment*1e-2,tail_assay,feed_assay)
         _feedmass += feedmass(fuelmass,powered_ship.enrichment*1e-2,tail_assay,feed_assay)
         pebble_number += fuelmass/(m_U_pebble*1e-6)
         reactor_number_fleet+=powered_ship.total_reactornumber # add all reactors for this ship segment
-    waste = pebble_number*np.pi/6*d_pebble**3*geometric_factor # waste volume
+    waste = pebble_number*np.pi/6*d_pebble**3 # waste volume of pebbles
     return FuelNeeds(fuel_throughput,swu,_feedmass,pebble_number,waste,reactor_number_fleet)
 
 # Deployment over time (2035-2060)
 def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_assay = 0.72*1e-2,
                end_year = 2060,phasechange =7,storeyears = 10,steepness = 1.0,
-               m_U_pebble = 8,d_pebble = 6*1e-2,m_truck=8.4,geometric_factor = 25):
+               m_U_pebble = 8,d_pebble = 6*1e-2,V_truck=11.7935*4/np.pi,geometric_factor_fresh=6.9885*4/np.pi,geometric_factor_spent=18.43265*4/np.pi):
     """
     Get model outputs over time for a given deployment scenario.
 
@@ -80,10 +77,12 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
         Uranium mass in a single fuel pebble [g]
     d_pebble: float
         Diameter of TRISO pebble [m]
-    m_truck : float
-        Uranium mass per truckload of spent fuel [kg]
-    geometric_factor: float
-        Conversion factor between pebble volume and storage cylinder volume.
+    V_truck : float
+        Volume of casks transported by single truck [m^3]
+    geometric_factor_fresh: float
+        Conversion factor between pebble volume and fresh storage cylinder volume.
+    geometric_factor_spent: float
+        Conversion factor between pebble volume and spent storage cylinder volume.
     Returns
     -------
     List of instances of FuelNeeds class
@@ -95,7 +94,7 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
     List of floats
         Years after 2035.
     """
-    def two_phase_deployment(ships_end,phase,year,phasechange,end_year,steepness=1.0):
+    def two_phase_deployment(ships_end,phase,year,phasechange,end_year,steepness):
         """
         Calculate the number of ships in a segment for a year after 2035.
 
@@ -118,12 +117,13 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
         int
             Number of ships of this segment at year {year} after 2035.
         """
+    
         if phase == 1:
-            K1 = ships_end
+            K1 = ships_end*(1+np.exp(-steepness*((end_year-2035)-(end_year-2035)/2))) # add normalization factor to ensure fleet size in end_year is correct
             K2 = 0
         elif phase == 2:
             K1 = 0
-            K2 = ships_end
+            K2 = ships_end*(1+np.exp(-steepness*((end_year-2035)-(end_year-2035+phasechange)/2))) # different normalization for phase 2
         return round(K1*sigmoid(year,steepness,(end_year-2035)/2)+K2*sigmoid(year,steepness,(end_year-2035+phasechange)/2))
     years = [i for i in range(end_year-2035+1+N_years+storeyears)]# years after 2035, goes until end_year + N_years+storeyears
     fleet_shares = np.loadtxt(f"inputs/scenario/scenario_{scenario}.txt",delimiter=';',dtype=str)
@@ -136,7 +136,7 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
             fleet_i = []
             ships_in_fleet_i = 0
             for j in range(1,len(fleet_shares[:,0])): # loop over ship segments
-                shipnumber= two_phase_deployment(fleet_shares[j,1].astype(float)*1e-2*ships_total,
+                shipnumber= two_phase_deployment(round(fleet_shares[j,1].astype(float)*1e-2*ships_total),
                                                                                         fleet_shares[j,4].astype(int),
                                                                                         year,
                                                                                         phasechange=phasechange,
@@ -151,21 +151,21 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
                                                             ))
             ships_in_fleet.append(ships_in_fleet_i)
             fleet.append(fleet_i)
-            fuel_needs_i = model(fleet_i,tail_assay,feed_assay,m_U_pebble,d_pebble,geometric_factor)
+            fuel_needs_i = model(fleet_i,tail_assay,feed_assay,m_U_pebble,d_pebble)
             fuel_needs.append(fuel_needs_i)
         else: # the case where deployment is finished, but need to run simulation until fuel and infrastructure values converge
             ships_in_fleet_i = ships_in_fleet[-1]
             ships_in_fleet.append(ships_in_fleet_i)
-            fuel_needs_i = model(fleet[-1],tail_assay,feed_assay,m_U_pebble,d_pebble,geometric_factor)
+            fuel_needs_i = model(fleet[-1],tail_assay,feed_assay,m_U_pebble,d_pebble)
             fuel_needs.append(fuel_needs_i)
         # calculate fresh and spent fuel storage needs
         if year == 0:
-            fresh_store=N_years*fuel_needs[year].waste # "waste" is a measure of total pebble volume burnt per year on average
+            fresh_store=N_years*fuel_needs[year].waste*geometric_factor_fresh # fresh store needs = waste volume * geometric factor fresh for storage cylinder volume
             fuelinit = ships_in_fleet[0]
             fuelinit_tons = N_years*fuel_needs_i.fuel_throughput
             fuelinit_pebbles = N_years*fuel_needs_i.pebble_number
         else:
-            fresh_store = N_years*(fuel_needs[year].waste-fuel_needs[year-1].waste)
+            fresh_store = N_years*(fuel_needs[year].waste-fuel_needs[year-1].waste)*geometric_factor_fresh
             fuelinit = ships_in_fleet[year]-ships_in_fleet[year-1]
             fuelinit_tons =  N_years*(fuel_needs[year].fuel_throughput-fuel_needs[year-1].fuel_throughput)
             fuelinit_pebbles =  N_years*(fuel_needs[year].pebble_number-fuel_needs[year-1].pebble_number)
@@ -178,11 +178,11 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
                 refuelings += infrastructure_needs[year-n*N_years].fuelinit
                 refueling_tons += infrastructure_needs[year-n*N_years].fuelinit_tons
                 refueling_pebbles += infrastructure_needs[year-n*N_years].fuelinit_pebbles
-            fresh_store += infrastructure_needs[year-N_years].fresh_store#N_years*(fuel_needs[year-N_years*(i+1)].waste-fuel_needs[year-N_years*(i+1)-1].waste)
-            spent_store = infrastructure_needs[year-1].spent_store+infrastructure_needs[year-N_years].fresh_store # spent fuel storage = fresh fuel storage at refueling
+            fresh_store += infrastructure_needs[year-N_years].fresh_store
+            spent_store = infrastructure_needs[year-1].spent_store+infrastructure_needs[year-N_years].fresh_store*geometric_factor_spent/geometric_factor_fresh # spent fuel storage = fresh fuel storage at refueling. multiply by geometric_factor_spent/geometric_factor_fresh to account for different cask dimensions
             if year-N_years-storeyears>=0:# remove spent fuel from storage at certain time interval
-                spent_store-= infrastructure_needs[year-N_years-storeyears].fresh_store
-                truckloads_waste += math.ceil(mass_from_volume(infrastructure_needs[year-N_years-storeyears].fresh_store/geometric_factor,d_pebble,m_U_pebble)/m_truck)
+                spent_store-= infrastructure_needs[year-N_years-storeyears].fresh_store*geometric_factor_spent/geometric_factor_fresh
+                truckloads_waste += math.ceil((infrastructure_needs[year-N_years-storeyears].fresh_store*geometric_factor_spent/geometric_factor_fresh)/V_truck)
         else:
             spent_store = 0.0
             refuelings = 0
@@ -199,7 +199,7 @@ def deployment(scenario,ships_total = 600,N_years = 5,tail_assay=0.4*1e-2,feed_a
 
 def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,feed_assay = 0.72*1e-2,
                   end_year=2060,phasechange= 7,storeyears = 10,steepness = 1.0,
-                  geometric_factor=25,store_container_height = 2.78,
+                  geometric_factor_fresh=6.9885*4/np.pi,geometric_factor_spent=18.43265*4/np.pi,fresh_store_container_height = 1.778,spent_store_container_height = 2.113,
                   save_deployment=True,save_plots=True,plotting = True):
     """
     Plot model outputs over time for a given deployment scenario.
@@ -224,10 +224,14 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
         Years spent fuel are stored in port.
     steepness : float
         Steepness of sigmoid deployment curve.
-    geometric_factor: float
-        Conversion factor between pebble volume and storage cylinder volume.
-    store_container_height : float
-        Height of fuel storage containers.
+    geometric_factor_fresh: float
+        Conversion factor between pebble volume and fresh storage cylinder volume.
+    geometric_factor_spent: float
+        Conversion factor between pebble volume and spent storage cylinder volume.
+    fresh_store_container_height : float
+        Height of fresh fuel storage containers in meters.
+    spent_store_container_height : float
+        Height of spent fuel storage containers in meters.
     save_deployment : boolean
         Whether to save time development of number of vessels in each ship segment to file.
     Returns
@@ -237,7 +241,7 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
     # consider adding option for loading stored results from file
     fuel_needs,infrastructure_needs,fleet,years = deployment(scenario,ships_total,N_years,tail_assay,feed_assay,
                                                              end_year=end_year,phasechange=phasechange,storeyears=storeyears,
-                                                             steepness=steepness,geometric_factor=geometric_factor)
+                                                             steepness=steepness,geometric_factor_fresh=geometric_factor_fresh,geometric_factor_spent=geometric_factor_spent)
     # extract data
     fuel_throughput  = [fuel_needs[i].fuel_throughput for i in range(len(fuel_needs))]
     pebble_number  = [fuel_needs[i].pebble_number for i in range(len(fuel_needs))]
@@ -346,7 +350,7 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         ax1.plot(np.array(years)+2035,np.array(fresh_store),color='m',marker='d')
-        ax2.plot(np.array(years)+2035,np.array(fresh_store)/store_container_height,color='m',marker='d') 
+        ax2.plot(np.array(years)+2035,np.array(fresh_store)/fresh_store_container_height,color='m',marker='d') 
         plt.title(f"Fresh fuel storage needs per year \n in {scenario} scenario, {N_years} year refueling interval")
         ax1.set_xlabel("Year")
         ax1.set_ylabel(r"Volume [$m^3$]")
@@ -363,7 +367,7 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         ax1.plot(np.array(years)+2035,np.array(spent_store),color='c',marker='o')
-        ax2.plot(np.array(years)+2035,np.array(spent_store)/store_container_height,color='c',marker='o')
+        ax2.plot(np.array(years)+2035,np.array(spent_store)/spent_store_container_height,color='c',marker='o')
         plt.title(f"Spent fuel storage needs per year \n in {scenario} scenario, {N_years} year refueling interval, {storeyears} year storage")
         ax1.set_xlabel("Year")
         ax1.set_ylabel(r"Volume [$m^3$]")
@@ -431,18 +435,19 @@ def run_scenario(scenario,ships_total = 600,N_years = 5,tail_assay=0.55*1e-2,fee
 
 def main():
     scenarios = ["baseline","high-burnup","low-burnup","high-enrichment","low-enrichment","4R","7R","4S","10S","high","low"]
+    steepness = 0.32 # set steepness of sigmoid deployment curve
     for scenario in scenarios:
         if scenario == "baseline":
-            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,steepness=0.55,phasechange=7,
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,steepness=steepness,phasechange=7,
                       save_deployment=True,tail_assay=0.4*1e-2,plotting=True)
         elif (scenario[0] in ["4","7"]) or (scenario[0:2]=="10"):
             if scenario[0:2] == "10":
                 time = int(scenario[0:2])
                 if scenario[2]=="R":
-                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=time,steepness=0.55,phasechange=7,
+                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=time,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
                 elif scenario[2]=="S":
-                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=time,N_years=5,steepness=0.55,phasechange=7,
+                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=time,N_years=5,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
                 else:
                     print(f"Error: refueling time or storage time change scenario failed, code:{scenario}")
@@ -450,23 +455,23 @@ def main():
             else:
                 time = int(scenario[0])
                 if scenario[1]=="R":
-                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=time,steepness=0.55,phasechange=7,
+                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=time,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
                 elif scenario[1]=="S":
-                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=time,N_years=5,steepness=0.55,phasechange=7,
+                    run_scenario(scenario,ships_total=800,end_year=2060,storeyears=time,N_years=5,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
                 else:
                     print(f"Error: refueling time or storage time change scenario failed, code:{scenario}")
                     break
         # scenarios with combined high and low refueling interval, burnup and enrichment
         elif scenario == "high":
-            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=7,steepness=0.55,phasechange=7,
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=7,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
         elif scenario == "low":
-            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=4,steepness=0.55,phasechange=7,
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=4,steepness=steepness,phasechange=7,
                                 save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
         else:
-            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=5,steepness=0.55,phasechange=7,
+            run_scenario(scenario,ships_total=800,end_year=2060,storeyears=5,N_years=5,steepness=steepness,phasechange=7,
                           save_deployment=False,tail_assay=0.4*1e-2,plotting=False)
     
 if __name__ == "__main__":
